@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniPulse // Cyberpunk Anime Vault</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Animated Matrix Rain Canvas -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Scanline Overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Glowing Orbs Background -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="glitch-text" data-text="ANIPULSE">ANIPULSE</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <p class="loading-status" id="loadingStatus">INITIALIZING NEURAL NETWORK...</p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app-container" id="appContainer">
+
+        <!-- NAVBAR -->
+        <header class="navbar">
+            <div class="logo-section">
+                <div class="logo-icon-box">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">ANI<span class="neon-pink">PULSE</span></span>
+                    <span class="logo-sub">// CYBERPUNK ANIME VAULT v2.0</span>
+                </div>
+            </div>
+
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <i class="fa-solid fa-terminal search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="SEARCH_ANIME.exe" autocomplete="off" spellcheck="false">
+                    <div class="search-cursor"></div>
+                </div>
+            </div>
+
+            <div class="nav-btns">
+                <button id="randomBtn" class="cyber-btn green">
+                    <span class="btn-glitch" data-text="RANDOMIZE">RANDOMIZE</span>
+                    <i class="fa-solid fa-dice"></i>
+                </button>
+                <button id="watchlistBtn" class="cyber-btn pink">
+                    <span class="btn-glitch" data-text="VAULT">VAULT</span>
+                    <i class="fa-solid fa-database"></i>
+                    <span class="vault-count" id="savedCount">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- HERO BANNER -->
+        <section class="hero-section">
+            <div class="hero-text">
+                <p class="hero-sub">// DISCOVER • EXPLORE • SAVE</p>
+                <h1 class="hero-title">
+                    YOUR ULTIMATE<br>
+                    <span class="glitch-word" data-text="ANIME UNIVERSE">ANIME UNIVERSE</span>
+                </h1>
+                <p class="hero-desc">Neural-linked to MyAnimeList Database. <span class="neon-cyan">10,000+ titles</span> at your command.</p>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <span class="stat-num neon-cyan">10K+</span>
+                    <span class="stat-label">Titles</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num neon-pink">500+</span>
+                    <span class="stat-label">Studios</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num neon-green">24/7</span>
+                    <span class="stat-label">Live Data</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTER CHIPS -->
+        <div class="filter-bar">
+            <div class="filter-label">
+                <i class="fa-solid fa-sliders"></i> FILTER:
+            </div>
+            <div class="chips">
+                <button class="chip active" data-type="top">
+                    <i class="fa-solid fa-fire"></i> TOP RATED
+                </button>
+                <button class="chip" data-type="airing">
+                    <i class="fa-solid fa-satellite-dish"></i> AIRING NOW
+                </button>
+                <button class="chip" data-type="upcoming">
+                    <i class="fa-solid fa-rocket"></i> UPCOMING
+                </button>
+                <button class="chip" data-type="movie">
+                    <i class="fa-solid fa-film"></i> MOVIES
+                </button>
+                <button class="chip" data-type="bypopularity">
+                    <i class="fa-solid fa-chart-line"></i> TRENDING
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION TITLE -->
+        <div class="section-title-bar">
+            <div class="title-left">
+                <span class="title-bracket">[</span>
+                <h2 id="sectionTitle">TOP_RATED.db</h2>
+                <span class="title-bracket">]</span>
+            </div>
+            <div class="title-line"></div>
+            <span class="result-count" id="resultCount">Loading...</span>
+        </div>
+
+        <!-- LOADER -->
+        <div id="loaderBox" class="cyber-loader hidden">
+            <div class="loader-rings">
+                <div class="ring ring-1"></div>
+                <div class="ring ring-2"></div>
+                <div class="ring ring-3"></div>
+            </div>
+            <p class="loader-text">FETCHING DATA<span class="dots">...</span></p>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div id="errorBox" class="error-box hidden">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p id="errorText">CONNECTION FAILED. RETRY.</p>
+        </div>
+
+        <!-- ANIME GRID -->
+        <main id="animeGrid" class="anime-grid"></main>
+
+    </div>
+
+    <!-- MODAL -->
+    <div id="animeModal" class="modal-overlay hidden">
+        <div class="modal-box">
+
+            <button id="closeModal" class="modal-close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Anime Backdrop -->
+            <div class="modal-backdrop" id="modalBackdrop"></div>
+            <div class="modal-backdrop-overlay"></div>
+
+            <!-- Modal Content -->
+            <div class="modal-content-grid">
+
+                <!-- Left: Poster -->
+                <div class="modal-poster-box">
+                    <img id="modalPoster" src="" alt="Poster">
+                    <div class="modal-rank" id="modalRank">#1</div>
+                </div>
+
+                <!-- Right: Info -->
+                <div class="modal-info">
+                    <p class="modal-type-label" id="modalType">TV SERIES</p>
+                    <h2 id="modalTitle" class="modal-title">Anime Title</h2>
+                    <p id="modalTitleEng" class="modal-title-eng">English Title</p>
+
+                    <div class="modal-stats-row">
+                        <div class="mstat">
+                            <i class="fa-solid fa-star neon-gold"></i>
+                            <span id="modalScore">N/A</span>
+                        </div>
+                        <div class="mstat">
+                            <i class="fa-solid fa-tv neon-cyan"></i>
+                            <span id="modalEpisodes">? Eps</span>
+                        </div>
+                        <div class="mstat">
+                            <i class="fa-solid fa-circle-dot neon-green"></i>
+                            <span id="modalStatus">Unknown</span>
+                        </div>
+                        <div class="mstat">
+                            <i class="fa-solid fa-calendar neon-pink"></i>
+                            <span id="modalYear">?</span>
+                        </div>
+                    </div>
+
+                    <!-- Genre Tags -->
+                    <div id="genreTags" class="genre-tags"></div>
+
+                    <!-- Synopsis -->
+                    <div class="synopsis-box">
+                        <p class="synopsis-label">// SYNOPSIS</p>
+                        <p id="modalSynopsis" class="synopsis-text">Loading...</p>
+                    </div>
+
+                    <!-- Trailer Button -->
+                    <div class="modal-actions">
+                        <button id="trailerBtn" class="cyber-btn green">
+                            <i class="fa-solid fa-play"></i> WATCH TRAILER
+                        </button>
+                        <button id="modalSaveBtn" class="cyber-btn pink">
+                            <i class="fa-solid fa-heart"></i> ADD TO VAULT
+                        </button>
+                        <a id="malLink" href="#" target="_blank" class="cyber-btn cyan">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> MAL PAGE
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trailer Embed -->
+            <div class="trailer-section hidden" id="trailerSection">
+                <div class="trailer-header">
+                    <span>// OFFICIAL TRAILER</span>
+                    <button id="closeTrailer" class="close-trailer-btn">
+                        <i class="fa-solid fa-compress"></i> CLOSE
+                    </button>
+                </div>
+                <div class="trailer-frame" id="trailerFrame"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
